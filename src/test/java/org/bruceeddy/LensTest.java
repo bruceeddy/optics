@@ -1,5 +1,6 @@
 package org.bruceeddy;
 
+import co.unruly.matchers.OptionalMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -7,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Arrays.asList;
@@ -55,9 +57,24 @@ public class LensTest {
     @Test
     public void lensShouldModifyF_forListF() {
         Function<Integer, List<Integer>> neigbours = n -> asList(n - 1, n + 1);
-        List<Address> modifiedF = streetNumber.modifyF(neigbours).apply(anAddress);
+        List<Address> modifiedF = streetNumber.modifyFList(neigbours).apply(anAddress);
 
         assertThat(modifiedF, contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
+    }
+
+    @Test
+    public void lensShouldModifyF_forOptionalF() {
+        Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? Optional.of(n) : Optional.empty();
+        Address negativeStreetNumber = streetNumber.set(-10).apply(anAddress);
+
+
+        Optional<Address> modifiedFPresent = streetNumber.modifyFOptional(onlyPositive).apply(anAddress);
+        Optional<Address> modifiedFAbsent = streetNumber.modifyFOptional(onlyPositive).apply(negativeStreetNumber);
+
+
+        assertThat(modifiedFPresent, OptionalMatchers.contains(anAddress));
+        assertThat(modifiedFAbsent, OptionalMatchers.empty());
+
     }
 
     private Matcher<Address> addressWithStreetNumber(int i) {
@@ -92,11 +109,24 @@ public class LensTest {
     }
 
     @Test
-    public void composedLensShouldModifyF() {
+    public void composedLensShouldModifyF_forListF() {
         Function<Integer, List<Integer>> neigbours = n -> asList(n - 1, n + 1);
-        List<Person> modifiedF = personsStreetNumber.modifyF(neigbours).apply(aPerson);
+        List<Person> modifiedF = personsStreetNumber.modifyFList(neigbours).apply(aPerson);
 
         assertThat(modifiedF, contains(personWithStreetNumber(9), personWithStreetNumber(11)));
+    }
+
+    @Test
+    public void composedLensShouldModifyF_forOptionalF() {
+        Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? Optional.of(n) : Optional.empty();
+        Person negativeStreetNumber = personsStreetNumber.set(-10).apply(aPerson);
+
+        Optional<Person> modifiedFPresent = personsStreetNumber.modifyFOptional(onlyPositive).apply(aPerson);
+        Optional<Person> modifiedFAbsent = personsStreetNumber.modifyFOptional(onlyPositive).apply(negativeStreetNumber);
+
+        assertThat(modifiedFPresent, OptionalMatchers.contains(aPerson));
+        assertThat(modifiedFAbsent, OptionalMatchers.empty());
+
     }
 
     private Matcher<Person> personWithStreetNumber(int i) {
@@ -151,6 +181,24 @@ public class LensTest {
             sb.append('}');
             return sb.toString();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Address address = (Address) o;
+
+            if (streetNumber != address.streetNumber) return false;
+            return streetName != null ? streetName.equals(address.streetName) : address.streetName == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = streetNumber;
+            result = 31 * result + (streetName != null ? streetName.hashCode() : 0);
+            return result;
+        }
     }
 
     static class Person {
@@ -162,6 +210,36 @@ public class LensTest {
             this.name = name;
             this.age = age;
             this.address = address;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("Person{");
+            sb.append("name='").append(name).append('\'');
+            sb.append(", age=").append(age);
+            sb.append(", address=").append(address);
+            sb.append('}');
+            return sb.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Person person = (Person) o;
+
+            if (age != person.age) return false;
+            if (name != null ? !name.equals(person.name) : person.name != null) return false;
+            return address != null ? address.equals(person.address) : person.address == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + age;
+            result = 31 * result + (address != null ? address.hashCode() : 0);
+            return result;
         }
     }
 }

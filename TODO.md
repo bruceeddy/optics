@@ -2,10 +2,10 @@
  * ~~finish tests for compose~~
  * ~~own project~~
  * ~~separate test and object~~
- * ~~better matchers in modifyF test~~
- * better factor tests
+ * ~~better matchers in modifyFList test~~
+ * ~~better factor tests~~
  * PBTs (for laws, at least)
- * modifyF for other functors (Future?, Optional)
+ * modifyFList for other functors (Future?, Optional)
  * abstract over other functors
  *
  *

@@ -1,6 +1,7 @@
 package org.bruceeddy;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -26,8 +27,13 @@ public class Lenses {
                 return v -> set(f.apply(get(v))).apply(v);
             }
 
-            public Function<V, List<V>> modifyF(Function<R, List<R>> f) {
+            public Function<V, List<V>> modifyFList(Function<R, List<R>> f) {
                 return v -> f.apply(get(v)).stream().map(r -> set(r).apply(v)).collect(toList());
+            }
+
+            @Override
+            public Function<V, Optional<V>> modifyFOptional(Function<R, Optional<R>> f) {
+                return v -> f.apply(get(v)).map(r -> set(r).apply(v));
             }
 
             public <U> Lens<U, R> compose(Lens<U, V> comp) {
@@ -65,8 +71,13 @@ public class Lenses {
         }
 
         @Override
-        public Function<U, List<U>> modifyF(Function<R, List<R>> f) {
-            return comp1.modifyF(comp2.modifyF(f));
+        public Function<U, List<U>> modifyFList(Function<R, List<R>> f) {
+            return comp1.modifyFList(comp2.modifyFList(f));
+        }
+
+        @Override
+        public Function<U, Optional<U>> modifyFOptional(Function<R, Optional<R>> f) {
+            return comp1.modifyFOptional(comp2.modifyFOptional(f));
         }
 
         @Override
