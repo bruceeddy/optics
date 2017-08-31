@@ -11,7 +11,7 @@ public class LensTopLevel {
         return (A a) -> (B b) -> f.apply(a, b);
     }
 
-    public static <V,R> Lens<V, R> gen(Function<V, R> f, BiFunction<R, V, V> g) {
+    public static <V, R> Lens<V, R> gen(Function<V, R> f, BiFunction<R, V, V> g) {
         class Lensy implements Lens<V, R> {
             public R get(V v) {
                 return f.apply(v);
@@ -36,29 +36,28 @@ public class LensTopLevel {
         }
 
 
-
         return new Lensy();
     }
 
-    interface Lens<V, R>  {
+    interface Lens<V, R> {
 
         public R get(V v);
 
-        public Function<V,V> set(R i);
+        public Function<V, V> set(R i);
 
-        public Function<V,V> modify(Function<R, R> f);
+        public Function<V, V> modify(Function<R, R> f);
 
-        public Function<V,List<V>> modifyF(Function<R, List<R>> f);
+        public Function<V, List<V>> modifyF(Function<R, List<R>> f);
 
-        public <U> Lens<U,R> compose(Lens<U, V> comp);
+        public <U> Lens<U, R> compose(Lens<U, V> comp);
     }
 
-    static class Composed<U, R, V> implements Lens<U,R>  {
+    static class Composed<U, R, V> implements Lens<U, R> {
 
         private Lens<U, V> comp1;
         private Lens<V, R> comp2;
 
-        public Composed(Lens<U, V> comp1, Lens<V,R> comp2) {
+        public Composed(Lens<U, V> comp1, Lens<V, R> comp2) {
             this.comp1 = comp1;
             this.comp2 = comp2;
         }
