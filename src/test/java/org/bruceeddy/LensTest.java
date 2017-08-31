@@ -16,11 +16,11 @@ import static org.junit.Assert.assertThat;
 
 public class LensTest {
 
-    private LensTopLevel.Lens<Address, Integer> streetNumber;
-    private LensTopLevel.Lens<Person, Address> address;
+    private Lens<Address, Integer> streetNumber;
+    private Lens<Person, Address> address;
     private Address anAddress;
     private Person aPerson;
-    private LensTopLevel.Lens<Person, Integer> personsStreetNumber;
+    private Lens<Person, Integer> personsStreetNumber;
 
     @Before
     public void createValues() {
@@ -30,8 +30,8 @@ public class LensTest {
 
     @Before
     public void createLenses() {
-        streetNumber = LensTopLevel.gen(a -> a.streetNumber, (i, a) -> new Address(i, a.streetName));
-        address = LensTopLevel.gen(p -> p.address, (a, p) -> new Person(p.name, p.age, a));
+        streetNumber = Lenses.gen(a -> a.streetNumber, (i, a) -> new Address(i, a.streetName));
+        address = Lenses.gen(p -> p.address, (a, p) -> new Person(p.name, p.age, a));
         personsStreetNumber = streetNumber.compose(address);
     }
 
@@ -127,8 +127,8 @@ public class LensTest {
             }
         }
 
-        LensTopLevel.Lens<CoxedPair, Person> bow = LensTopLevel.gen(c -> c.bow, (p, c) -> new CoxedPair(c.cox, c.stroke, p));
-        LensTopLevel.Lens<CoxedPair, Integer> bowsStreetNumber = personsStreetNumber.compose(bow);
+        Lens<CoxedPair, Person> bow = Lenses.gen(c -> c.bow, (p, c) -> new CoxedPair(c.cox, c.stroke, p));
+        Lens<CoxedPair, Integer> bowsStreetNumber = personsStreetNumber.compose(bow);
 
         assertThat(bowsStreetNumber.get(new CoxedPair(null, null, aPerson)), is(10));
     }

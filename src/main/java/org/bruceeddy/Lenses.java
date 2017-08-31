@@ -6,8 +6,9 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 
-public class LensTopLevel {
-    public static <A, B, C> Function<A, Function<B, C>> curry(final BiFunction<A, B, C> f) {
+public class Lenses {
+
+    private static <A, B, C> Function<A, Function<B, C>> curry(final BiFunction<A, B, C> f) {
         return (A a) -> (B b) -> f.apply(a, b);
     }
 
@@ -30,7 +31,6 @@ public class LensTopLevel {
             }
 
             public <U> Lens<U, R> compose(Lens<U, V> comp) {
-
                 return new Composed(comp, Lensy.this);
             }
         }
@@ -39,20 +39,7 @@ public class LensTopLevel {
         return new Lensy();
     }
 
-    interface Lens<V, R> {
-
-        public R get(V v);
-
-        public Function<V, V> set(R i);
-
-        public Function<V, V> modify(Function<R, R> f);
-
-        public Function<V, List<V>> modifyF(Function<R, List<R>> f);
-
-        public <U> Lens<U, R> compose(Lens<U, V> comp);
-    }
-
-    static class Composed<U, R, V> implements Lens<U, R> {
+    private static class Composed<U, R, V> implements Lens<U, R> {
 
         private Lens<U, V> comp1;
         private Lens<V, R> comp2;
