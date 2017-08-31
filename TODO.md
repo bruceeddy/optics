@@ -2,7 +2,7 @@
  * ~~finish tests for compose~~
  * ~~own project~~
  * ~~separate test and object~~
- * better matchers in modifyF test
+ * ~~better matchers in modifyF test~~
  * better factor tests
  * PBTs (for laws, at least)
  * modifyF for other functors (Future?, Optional)

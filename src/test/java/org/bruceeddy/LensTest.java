@@ -1,5 +1,8 @@
 package org.bruceeddy;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,6 +11,7 @@ import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 
 public class LensTest {
@@ -48,14 +52,26 @@ public class LensTest {
         assertThat(modified.streetNumber, is(11));
     }
 
-    //use better matchers in the assertion
     @Test
     public void lensShouldModifyF_forListF() {
         Function<Integer, List<Integer>> neigbours = n -> asList(n - 1, n + 1);
         List<Address> modifiedF = streetNumber.modifyF(neigbours).apply(anAddress);
 
-        assertThat(modifiedF.get(0).streetNumber, is(9));
-        assertThat(modifiedF.get(1).streetNumber, is(11));
+        assertThat(modifiedF, contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
+    }
+
+    private Matcher<Address> addressWithStreetNumber(int i) {
+        return new TypeSafeDiagnosingMatcher<Address>() {
+            @Override
+            protected boolean matchesSafely(Address item, Description mismatchDescription) {
+                return item.streetNumber == i;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText(" an Address with street number " + i);
+            }
+        };
     }
 
     @Test
@@ -80,8 +96,21 @@ public class LensTest {
         Function<Integer, List<Integer>> neigbours = n -> asList(n - 1, n + 1);
         List<Person> modifiedF = personsStreetNumber.modifyF(neigbours).apply(aPerson);
 
-        assertThat(modifiedF.get(0).address.streetNumber, is(9));
-        assertThat(modifiedF.get(1).address.streetNumber, is(11));
+        assertThat(modifiedF, contains(personWithStreetNumber(9), personWithStreetNumber(11)));
+    }
+
+    private Matcher<Person> personWithStreetNumber(int i) {
+        return new TypeSafeDiagnosingMatcher<Person>() {
+            @Override
+            protected boolean matchesSafely(Person item, Description mismatchDescription) {
+                return item.address.streetNumber == i;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText(" a person with an address with street number " + i);
+            }
+        };
     }
 
     @Test
@@ -112,6 +141,15 @@ public class LensTest {
         public Address(int streetNumber, String streetName) {
             this.streetNumber = streetNumber;
             this.streetName = streetName;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("Address{");
+            sb.append("streetNumber=").append(streetNumber);
+            sb.append(", streetName='").append(streetName).append('\'');
+            sb.append('}');
+            return sb.toString();
         }
     }
 
