@@ -1,6 +1,5 @@
 package org.bruceeddy;
 
-import co.unruly.matchers.OptionalMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
