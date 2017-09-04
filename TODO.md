@@ -1,11 +1,12 @@
- _Todo_
+ Todo
+ ------
  * ~~finish tests for compose~~
  * ~~own project~~
  * ~~separate test and object~~
  * ~~better matchers in modifyFList test~~
  * ~~better factor tests~~
  * PBTs (for laws, at least)
- * modifyFList for other functors (Future?, Optional)
+ * ~~modifyFList for other functors (Future?, Optional)~~
  * abstract over other functors
  *
  *
@@ -14,7 +15,10 @@
  * example in exchange code
  * boiler-plateyness of real examples?
  *
+ * auto generation of lenses for data types
  *
- * Notes
- * -- the types wrote the code: e.g. compose.modify(F)
+
+ Notes
+ -----
+  * the types wrote the code: e.g. compose.modify(f)
  

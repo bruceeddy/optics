@@ -9,8 +9,12 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import static co.unruly.matchers.OptionalMatchers.contains;
+import static co.unruly.matchers.OptionalMatchers.empty;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
@@ -72,9 +76,17 @@ public class LensTest {
         Optional<Address> modifiedFAbsent = streetNumber.modifyFOptional(onlyPositive).apply(negativeStreetNumber);
 
 
-        assertThat(modifiedFPresent, OptionalMatchers.contains(anAddress));
-        assertThat(modifiedFAbsent, OptionalMatchers.empty());
+        assertThat(modifiedFPresent, contains(anAddress));
+        assertThat(modifiedFAbsent, empty());
 
+    }
+
+    @Test
+    public void lensShouldModifyF_forFutureF() throws ExecutionException, InterruptedException {
+        Function<Integer, CompletableFuture<Integer>> addOneAsync = x -> CompletableFuture.supplyAsync(()->x+1);
+        CompletableFuture<Address> modifiedF = streetNumber.modifyFFuture(addOneAsync).apply(anAddress);
+
+        assertThat(modifiedF, is(futureWhichResolvesTo(addressWithStreetNumber(11))));
     }
 
     private Matcher<Address> addressWithStreetNumber(int i) {
@@ -124,9 +136,31 @@ public class LensTest {
         Optional<Person> modifiedFPresent = personsStreetNumber.modifyFOptional(onlyPositive).apply(aPerson);
         Optional<Person> modifiedFAbsent = personsStreetNumber.modifyFOptional(onlyPositive).apply(negativeStreetNumber);
 
-        assertThat(modifiedFPresent, OptionalMatchers.contains(aPerson));
-        assertThat(modifiedFAbsent, OptionalMatchers.empty());
+        assertThat(modifiedFPresent, contains(aPerson));
+        assertThat(modifiedFAbsent, empty());
 
+    }
+
+    @Test
+    public void composedLensShouldModifyF_forFutureF() throws ExecutionException, InterruptedException {
+        Function<Integer, CompletableFuture<Integer>> addOneAsync = x -> CompletableFuture.supplyAsync(()->x+1);
+        CompletableFuture<Person> modifiedF = personsStreetNumber.modifyFFuture(addOneAsync).apply(aPerson);
+
+        assertThat(modifiedF, is(futureWhichResolvesTo(personWithStreetNumber(11))));
+    }
+
+    private <T> Matcher<CompletableFuture<T>> futureWhichResolvesTo(Matcher<T> matcher) {
+        return new TypeSafeDiagnosingMatcher<CompletableFuture<T>>() {
+            @Override
+            protected boolean matchesSafely(CompletableFuture<T> item, Description mismatchDescription) {
+                return matcher.matches(item.join());
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("a future which resolves to" + matcher);
+            }
+        };
     }
 
     private Matcher<Person> personWithStreetNumber(int i) {

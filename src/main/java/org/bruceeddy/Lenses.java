@@ -2,6 +2,7 @@ package org.bruceeddy;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -34,6 +35,11 @@ public class Lenses {
             @Override
             public Function<V, Optional<V>> modifyFOptional(Function<R, Optional<R>> f) {
                 return v -> f.apply(get(v)).map(r -> set(r).apply(v));
+            }
+
+            @Override
+            public Function<V, CompletableFuture<V>> modifyFFuture(Function<R, CompletableFuture<R>> f) {
+                return v -> f.apply(get(v)).thenApply(r -> set(r).apply(v));
             }
 
             public <U> Lens<U, R> compose(Lens<U, V> comp) {
@@ -78,6 +84,11 @@ public class Lenses {
         @Override
         public Function<U, Optional<U>> modifyFOptional(Function<R, Optional<R>> f) {
             return comp1.modifyFOptional(comp2.modifyFOptional(f));
+        }
+
+        @Override
+        public Function<U, CompletableFuture<U>> modifyFFuture(Function<R, CompletableFuture<R>> f) {
+            return comp1.modifyFFuture(comp2.modifyFFuture(f));
         }
 
         @Override
