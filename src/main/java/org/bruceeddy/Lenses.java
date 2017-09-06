@@ -98,8 +98,7 @@ public class Lenses {
 
         @Override
         public <T> Function<U, Functor<T, U>> modifyF(Function<R, Functor<T, R>> f) {
-           return null;
-            // return comp1.modifyF(comp2.modifyF(f));
+            return comp1.modifyF(comp2.modifyF(f));
         }
 
         @Override

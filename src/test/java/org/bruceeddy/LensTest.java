@@ -128,10 +128,8 @@ public class LensTest {
         Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? Optional.of(n) : Optional.empty();
         Address negativeStreetNumber = streetNumber.set(-10).apply(anAddress);
 
-
         Optional<Address> modifiedFPresent = streetNumber.modifyFOptional(onlyPositive).apply(anAddress);
         Optional<Address> modifiedFAbsent = streetNumber.modifyFOptional(onlyPositive).apply(negativeStreetNumber);
-
 
         assertThat(modifiedFPresent, contains(anAddress));
         assertThat(modifiedFAbsent, empty());
@@ -175,6 +173,17 @@ public class LensTest {
     public void composedLensShouldModify() {
         Person modified = personsStreetNumber.modify(x -> x + 1).apply(aPerson);
         assertThat(modified.address.streetNumber, is(11));
+    }
+
+    @Test
+    public void composedLensShouldModifyF_forFunctorOfList() {
+        Function<Integer, Functor<List,Integer>> neigbours = n -> listFunctor(asList(n - 1, n + 1));
+        Functor<List,Person> modifiedF = personsStreetNumber.modifyF(neigbours).apply(aPerson);
+
+        List<Person> persons = new ArrayList<>();
+        modifiedF.fmap(a -> persons.add(a));
+
+        assertThat(persons, contains(personWithStreetNumber(9), personWithStreetNumber(11)));
     }
 
     @Test
