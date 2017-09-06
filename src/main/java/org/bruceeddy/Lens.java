@@ -19,5 +19,7 @@ interface Lens<V, R> {
 
     Function<V, CompletableFuture<V>> modifyFFuture(Function<R, CompletableFuture<R>> f);
 
+    <T> Function<V, Functor<T,V>> modifyF(Function<R,Functor<T,R>> f);
+
     <U> Lens<U, R> compose(Lens<U, V> comp);
 }

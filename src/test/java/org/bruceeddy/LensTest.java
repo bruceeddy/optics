@@ -6,16 +6,19 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static co.unruly.matchers.OptionalMatchers.contains;
 import static co.unruly.matchers.OptionalMatchers.empty;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 
@@ -63,6 +66,61 @@ public class LensTest {
         List<Address> modifiedF = streetNumber.modifyFList(neigbours).apply(anAddress);
 
         assertThat(modifiedF, contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
+    }
+
+    private <T> Functor<List,T> listFunctor(List<T> l) {
+        return new Functor<List, T>()  {
+            @Override
+            public <R> Functor<List, R> fmap(Function<T, R> f) {
+                return listFunctor(l.stream().map(f).collect(Collectors.toList()));
+            }
+        };
+    }
+
+    private <T> Functor<Optional,T> optionalFunctor(Optional<T> l) {
+        return new Functor<Optional, T>() {
+
+            @Override
+            public <R> Functor<Optional, R> fmap(Function<T, R> f) {
+                return optionalFunctor(l.map(f));
+            }
+        };
+    }
+
+    @Test
+    public void lensShouldModifyF_forFunctorOfList() {
+        Function<Integer, Functor<List,Integer>> neigbours = n -> listFunctor(asList(n - 1, n + 1));
+        Functor<List,Address> modifiedF = streetNumber.modifyF(neigbours).apply(anAddress);
+
+        List<Address> addresses = new ArrayList<>();
+        modifiedF.fmap(a -> addresses.add (a));
+
+        assertThat(addresses, contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
+    }
+
+
+
+    @Test
+    public void lensShouldModifyF_forFunctorOfOptional() {
+        Function<Integer, Functor<Optional,Integer>> onlyPositive = n -> n > 0 ? optionalFunctor(Optional.of(n)) : optionalFunctor(Optional.empty());
+        Address negativeStreetNumber = streetNumber.set(-10).apply(anAddress);
+
+
+        Functor<Optional,Address> modifiedFPresent = streetNumber.modifyF(onlyPositive).apply(anAddress);
+        Functor<Optional,Address> modifiedFAbsent = streetNumber.modifyF(onlyPositive).apply(negativeStreetNumber);
+
+        class Holder<T>  {
+            T held;
+        }
+
+        Holder<Address> present = new Holder<>();
+        modifiedFPresent.fmap(o -> present.held = o);
+        Holder<Address> absent = new Holder<>();
+        modifiedFAbsent.fmap(o -> absent.held = o);
+
+        assertThat(present.held, is(anAddress));
+        assertThat(absent.held, is(nullValue()));
+
     }
 
     @Test

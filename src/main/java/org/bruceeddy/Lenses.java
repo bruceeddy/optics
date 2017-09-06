@@ -42,6 +42,11 @@ public class Lenses {
                 return v -> f.apply(get(v)).thenApply(r -> set(r).apply(v));
             }
 
+            @Override
+            public <T> Function<V, Functor<T, V>> modifyF(Function<R, Functor<T, R>> f) {
+                return v -> f.apply(get(v)).fmap(r -> set(r).apply(v));
+            }
+
             public <U> Lens<U, R> compose(Lens<U, V> comp) {
                 return new Composed(comp, Lensy.this);
             }
@@ -89,6 +94,12 @@ public class Lenses {
         @Override
         public Function<U, CompletableFuture<U>> modifyFFuture(Function<R, CompletableFuture<R>> f) {
             return comp1.modifyFFuture(comp2.modifyFFuture(f));
+        }
+
+        @Override
+        public <T> Function<U, Functor<T, U>> modifyF(Function<R, Functor<T, R>> f) {
+           return null;
+            // return comp1.modifyF(comp2.modifyF(f));
         }
 
         @Override
