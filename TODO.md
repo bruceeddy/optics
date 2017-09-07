@@ -7,7 +7,7 @@
  * ~~better factor tests~~
  * PBTs (for Lens laws, at least)
  * ~~modifyFList for other functors (Future?, Optional)~~
- * abstract over other functors
+ * ~~abstract over other functors~~
  * functor laws and PBTs thereto
  *
  * read about haskell lens - do the test examples in Haskell
