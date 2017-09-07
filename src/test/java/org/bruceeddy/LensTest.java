@@ -12,13 +12,13 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static co.unruly.matchers.OptionalMatchers.contains;
 import static co.unruly.matchers.OptionalMatchers.empty;
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
+import static org.bruceeddy.Functors.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 
@@ -68,64 +68,30 @@ public class LensTest {
         assertThat(modifiedF, contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
     }
 
-    private <T> Functor<List,T> listFunctor(List<T> l) {
-        return new Functor<List, T>()  {
-            @Override
-            public <R> Functor<List, R> fmap(Function<T, R> f) {
-                return listFunctor(l.stream().map(f).collect(Collectors.toList()));
-            }
-        };
-    }
-
-    private <T> Functor<Optional,T> optionalFunctor(Optional<T> l) {
-        return new Functor<Optional, T>() {
-
-            @Override
-            public <R> Functor<Optional, R> fmap(Function<T, R> f) {
-                return optionalFunctor(l.map(f));
-            }
-        };
-    }
-
     @Test
     public void lensShouldModifyF_forFunctorOfList() {
         Function<Integer, Functor<List,Integer>> neigbours = n -> listFunctor(asList(n - 1, n + 1));
         Functor<List,Address> modifiedF = streetNumber.modifyF(neigbours).apply(anAddress);
 
-        List<Address> addresses = new ArrayList<>();
-        modifiedF.fmap(a -> addresses.add (a));
-
-        assertThat(addresses, contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
+        assertThat(functorList(modifiedF), contains(addressWithStreetNumber(9), addressWithStreetNumber(11)));
     }
-
-
 
     @Test
     public void lensShouldModifyF_forFunctorOfOptional() {
-        Function<Integer, Functor<Optional,Integer>> onlyPositive = n -> n > 0 ? optionalFunctor(Optional.of(n)) : optionalFunctor(Optional.empty());
+        Function<Integer, Functor<Optional,Integer>> onlyPositive = n -> n > 0 ? optionalFunctor(of(n)) : optionalFunctor(Optional.empty());
         Address negativeStreetNumber = streetNumber.set(-10).apply(anAddress);
-
 
         Functor<Optional,Address> modifiedFPresent = streetNumber.modifyF(onlyPositive).apply(anAddress);
         Functor<Optional,Address> modifiedFAbsent = streetNumber.modifyF(onlyPositive).apply(negativeStreetNumber);
 
-        class Holder<T>  {
-            T held;
-        }
-
-        Holder<Address> present = new Holder<>();
-        modifiedFPresent.fmap(o -> present.held = o);
-        Holder<Address> absent = new Holder<>();
-        modifiedFAbsent.fmap(o -> absent.held = o);
-
-        assertThat(present.held, is(anAddress));
-        assertThat(absent.held, is(nullValue()));
+        assertThat(functorOptional(modifiedFPresent), contains(anAddress));
+        assertThat(functorOptional(modifiedFAbsent), empty());
 
     }
 
     @Test
     public void lensShouldModifyF_forOptionalF() {
-        Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? Optional.of(n) : Optional.empty();
+        Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? of(n) : Optional.empty();
         Address negativeStreetNumber = streetNumber.set(-10).apply(anAddress);
 
         Optional<Address> modifiedFPresent = streetNumber.modifyFOptional(onlyPositive).apply(anAddress);
@@ -196,7 +162,7 @@ public class LensTest {
 
     @Test
     public void composedLensShouldModifyF_forOptionalF() {
-        Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? Optional.of(n) : Optional.empty();
+        Function<Integer, Optional<Integer>> onlyPositive = n -> n > 0 ? of(n) : Optional.empty();
         Person negativeStreetNumber = personsStreetNumber.set(-10).apply(aPerson);
 
         Optional<Person> modifiedFPresent = personsStreetNumber.modifyFOptional(onlyPositive).apply(aPerson);

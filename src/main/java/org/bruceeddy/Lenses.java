@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
+import static org.bruceeddy.Functors.*;
 
 public class Lenses {
 
@@ -29,17 +29,20 @@ public class Lenses {
             }
 
             public Function<V, List<V>> modifyFList(Function<R, List<R>> f) {
-                return v -> f.apply(get(v)).stream().map(r -> set(r).apply(v)).collect(toList());
+                return b -> functorList(modifyF(r -> listFunctor(f.apply(r))).apply(b));
+                //return v -> f.apply(get(v)).stream().map(r -> set(r).apply(v)).collect(toList());
             }
 
             @Override
             public Function<V, Optional<V>> modifyFOptional(Function<R, Optional<R>> f) {
-                return v -> f.apply(get(v)).map(r -> set(r).apply(v));
+                return b -> functorOptional(modifyF(r -> optionalFunctor(f.apply(r))).apply(b));
+                // return v -> f.apply(get(v)).map(r -> set(r).apply(v));
             }
 
             @Override
             public Function<V, CompletableFuture<V>> modifyFFuture(Function<R, CompletableFuture<R>> f) {
-                return v -> f.apply(get(v)).thenApply(r -> set(r).apply(v));
+                return b -> functorFuture(modifyF(r -> futureFunctor(f.apply(r))).apply(b));
+                //return v -> f.apply(get(v)).thenApply(r -> set(r).apply(v));
             }
 
             @Override
