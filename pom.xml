@@ -49,6 +49,7 @@
             <groupId>co.unruly</groupId>
             <artifactId>java-8-matchers</artifactId>
             <version>1.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
