@@ -9,15 +9,21 @@
  * ~~modifyFList for other functors (Future?, Optional)~~
  * ~~abstract over other functors~~
  * functor laws and PBTs thereto
- *
+ 
  * read about haskell lens - do the test examples in Haskell
- *
- * example in exchange code
- * example using unruly.control Functor
+ 
+ * example in exchange code - AuctionDecider
+ * examples of replacing 
+    - builder pattern
+    - chains of getters
+ 
  * boiler-plateyness of real examples?
- *
  * auto generation of lenses for data types
- *
+ 
+ * example using unruly.control Functor
+ 
+ * other optics!  prisms!
+ 
 
  Notes
  -----
