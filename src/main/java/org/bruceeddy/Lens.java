@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-interface Lens<V, R> {
+public interface Lens<V, R> {
 
     R get(V v);
 
