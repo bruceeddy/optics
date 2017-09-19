@@ -12,6 +12,8 @@
  
  * read about haskell lens - do the test examples in Haskell
  
+ * package sources
+ 
  * example in exchange code - AuctionDecider
  * examples of replacing 
     - builder pattern
@@ -23,6 +25,8 @@
  * example using unruly.control Functor
  
  * other optics!  prisms!
+ * Optional^WShutter
+ * ~~Do Optional excercises~~
  
 
  Notes
