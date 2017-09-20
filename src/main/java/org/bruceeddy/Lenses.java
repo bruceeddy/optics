@@ -10,7 +10,7 @@ import static org.bruceeddy.Functors.*;
 
 public class Lenses {
 
-    private static <A, B, C> Function<A, Function<B, C>> curry(final BiFunction<A, B, C> f) {
+    public static <A, B, C> Function<A, Function<B, C>> curry(final BiFunction<A, B, C> f) {
         return (A a) -> (B b) -> f.apply(a, b);
     }
 
