@@ -4,9 +4,10 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static org.bruceeddy.Lenses.curry;
+import static org.bruceeddy.Curry.curry;
 
 public class Shutters {
+
     public static <V, R> Shutter<V, R> gen(Function<V, Optional<R>> getter, BiFunction<R, V, V> setter) {
         return new Shutter<V, R>() {
 

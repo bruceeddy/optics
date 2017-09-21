@@ -6,13 +6,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static org.bruceeddy.Curry.curry;
 import static org.bruceeddy.Functors.*;
 
 public class Lenses {
-
-    public static <A, B, C> Function<A, Function<B, C>> curry(final BiFunction<A, B, C> f) {
-        return (A a) -> (B b) -> f.apply(a, b);
-    }
 
     public static <V, R> Lens<V, R> gen(Function<V, R> f, BiFunction<R, V, V> g) {
         class Lensy implements Lens<V, R> {
