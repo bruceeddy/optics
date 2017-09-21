@@ -17,8 +17,7 @@ import java.util.stream.Collectors;
 import static co.unruly.matchers.OptionalMatchers.contains;
 import static co.unruly.matchers.OptionalMatchers.empty;
 import static java.util.stream.Stream.concat;
-import static org.bruceeddy.Lenses.curry;
-import static org.bruceeddy.ShutterTest.Shutters.gen;
+import static org.bruceeddy.Shutters.gen;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -27,38 +26,6 @@ public class ShutterTest {
     private List<Integer> xs;
     private List<Integer> ys;
     private Shutter<List<Integer>, Integer> head;
-
-    static class Shutters {
-        static <V, R> Shutter<V, R> gen(Function<V, Optional<R>> getter, BiFunction<R, V, V> setter) {
-            return new Shutter<V, R>() {
-
-                @Override
-                public Optional<R> getOptional(V v) {
-                    return getter.apply(v);
-                }
-
-                @Override
-                public Function<V, V> setOptional(R v) {
-                    return curry(setter).apply(v);
-                }
-
-                @Override
-                public boolean nonEmpty(V v) {
-                    return getOptional(v).map(x -> false).orElse(true);
-                }
-
-                @Override
-                public Function<V, V> modify(Function<R, R> f) {
-                    return v -> modifyOptional(f).apply(v).orElse(v);
-                }
-
-                @Override
-                public Function<V, Optional<V>> modifyOptional(Function<R, R> f) {
-                    return v -> getOptional(v).map(f).map(r -> setOptional(r)).map(h -> h.apply(v));
-                }
-            };
-        }
-    }
 
     @Before
     public void createTargets() {
