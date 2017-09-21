@@ -28,15 +28,17 @@ public class ShutterTest {
     private List<Integer> ys;
     private Shutter<List<Integer>, Integer> head;
 
-    static class Shutters  {
-        static <V,R> Shutter<V,R> gen(Function<V,Optional<R>> getter, BiFunction<R, V, V> setter)  {
-            return new Shutter<V,R>() {
-                @Override public Optional<R> getOptional(V v)  {
-                        return getter.apply(v);
-                    }
+    static class Shutters {
+        static <V, R> Shutter<V, R> gen(Function<V, Optional<R>> getter, BiFunction<R, V, V> setter) {
+            return new Shutter<V, R>() {
 
                 @Override
-                public Function<V,V> setOptional(R v) {
+                public Optional<R> getOptional(V v) {
+                    return getter.apply(v);
+                }
+
+                @Override
+                public Function<V, V> setOptional(R v) {
                     return curry(setter).apply(v);
                 }
 
@@ -44,21 +46,26 @@ public class ShutterTest {
                 public boolean nonEmpty(V v) {
                     return getOptional(v).map(x -> false).orElse(true);
                 }
+
+                @Override
+                public Function<V, V> modify(Function<R, R> f) {
+                    return v -> getOptional(v).map(f).map(r -> setOptional(r)).map(h -> h.apply(v)).orElse(v);
+                }
             };
         }
     }
 
     @Before
-    public void createTargets()  {
-        xs = Arrays.asList(1,2,3);
+    public void createTargets() {
+        xs = Arrays.asList(1, 2, 3);
         ys = Collections.emptyList();
     }
 
     @Before
-    public void createSUT()  {
-        Function<List<Integer>,Optional<Integer>> getter = i -> i.stream().findFirst();
-        BiFunction< Integer, List<Integer>,  List<Integer>> setter =
-                (j, i ) -> concat(i.stream().limit(1).map(x -> j), i.stream().skip(1)).collect(Collectors.toList());
+    public void createSUT() {
+        Function<List<Integer>, Optional<Integer>> getter = i -> i.stream().findFirst();
+        BiFunction<Integer, List<Integer>, List<Integer>> setter =
+                (j, i) -> concat(i.stream().limit(1).map(x -> j), i.stream().skip(1)).collect(Collectors.toList());
 
        /* Example of wrong setter - do laws catch this?
        (doesn't work for empty list)
@@ -69,34 +76,48 @@ public class ShutterTest {
     }
 
     @Test
-    public void shutterShouldGetPopulatedOptionalValue()  {
+    public void shutterShouldGetPopulatedOptionalValue() {
         assertThat(head.getOptional(xs), contains(1));
     }
 
     @Test
-    public void shutterShouldGetEmptyOptionalValue()  {
+    public void shutterShouldGetEmptyOptionalValue() {
         assertThat(head.getOptional(ys), empty());
     }
 
     @Test
-    public void shutterShouldSetPopulatedOptionalValue()  {
+    public void shutterShouldSetPopulatedOptionalValue() {
         List<Integer> set = head.setOptional(5).apply(xs);
-        assertThat(set, IsIterableContainingInOrder.contains(5,2,3));
+        assertThat(set, IsIterableContainingInOrder.contains(5, 2, 3));
     }
 
     @Test
-    public void shutterShouldSetEmptyOptionalValue()  {
+    public void shutterShouldSetEmptyOptionalValue() {
         List<Integer> set = head.setOptional(5).apply(ys);
         assertThat(set, IsEmptyCollection.empty());
     }
 
     @Test
-    public void nonEmptyShouldReturnFalseWhereTargetIsPopulated()  {
+    public void nonEmptyShouldReturnFalseWhereTargetIsPopulated() {
         assertThat(head.nonEmpty(xs), is(false));
     }
 
     @Test
-    public void nonEmptyShouldReturnTrueWhereTargetIsEmpty()  {
+    public void nonEmptyShouldReturnTrueWhereTargetIsEmpty() {
         assertThat(head.nonEmpty(ys), is(true));
     }
+
+    @Test
+    public void modifyShouldModifyPopulatedTarget() {
+        List<Integer> set = head.modify(x -> x + 10).apply(xs);
+        assertThat(set, IsIterableContainingInOrder.contains(11, 2, 3));
+    }
+
+    @Test
+    public void modifyShouldNotModifyEmptyTarget() {
+        List<Integer> set = head.modify(x -> x + 10).apply(ys);
+        assertThat(set, IsEmptyCollection.empty());
+    }
 }
+
+
