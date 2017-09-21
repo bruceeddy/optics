@@ -29,14 +29,14 @@ public class ShutterTest {
     private Shutter<List<Integer>, Integer> head;
 
     static class Shutters  {
-        static <V,R> Shutter<V,R> gen(Function<V,Optional<R>> getter, BiFunction<V,R,V> setter)  {
+        static <V,R> Shutter<V,R> gen(Function<V,Optional<R>> getter, BiFunction<R, V, V> setter)  {
             return new Shutter<V,R>() {
                 @Override public Optional<R> getOptional(V v)  {
                         return getter.apply(v);
                     }
 
                 @Override
-                public Function<R,V> setOptional(V v) {
+                public Function<V,V> setOptional(R v) {
                     return curry(setter).apply(v);
                 }
 
@@ -57,11 +57,12 @@ public class ShutterTest {
     @Before
     public void createSUT()  {
         Function<List<Integer>,Optional<Integer>> getter = i -> i.stream().findFirst();
-        BiFunction< List<Integer>,  Integer, List<Integer>> setter =
-                (i,j ) -> concat(i.stream().limit(1).map(x -> j), i.stream().skip(1)).collect(Collectors.toList());
+        BiFunction< Integer, List<Integer>,  List<Integer>> setter =
+                (j, i ) -> concat(i.stream().limit(1).map(x -> j), i.stream().skip(1)).collect(Collectors.toList());
 
        /* Example of wrong setter - do laws catch this?
        (doesn't work for empty list)
+       (and dates from when setter was a BiFunction<V,R,V> rather than <R,V,V>)
         BiFunction< List<Integer>,  Integer, List<Integer>> setter =
                 (i,j ) -> concat(Stream.of(j), i.stream().skip(1)).collect(Collectors.toList());*/
         head = gen(getter, setter);
@@ -79,13 +80,13 @@ public class ShutterTest {
 
     @Test
     public void shutterShouldSetPopulatedOptionalValue()  {
-        List<Integer> set = head.setOptional(xs).apply(5);
+        List<Integer> set = head.setOptional(5).apply(xs);
         assertThat(set, IsIterableContainingInOrder.contains(5,2,3));
     }
 
     @Test
     public void shutterShouldSetEmptyOptionalValue()  {
-        List<Integer> set = head.setOptional(ys).apply(5);
+        List<Integer> set = head.setOptional(5).apply(ys);
         assertThat(set, IsEmptyCollection.empty());
     }
 
