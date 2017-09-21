@@ -19,6 +19,7 @@ import static co.unruly.matchers.OptionalMatchers.empty;
 import static java.util.stream.Stream.concat;
 import static org.bruceeddy.Lenses.curry;
 import static org.bruceeddy.ShutterTest.Shutters.gen;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class ShutterTest {
@@ -28,15 +29,20 @@ public class ShutterTest {
     private Shutter<List<Integer>, Integer> head;
 
     static class Shutters  {
-        static <V,R> Shutter<V,R> gen(Function<V,Optional<R>> setter, BiFunction<V,R,V> getter)  {
+        static <V,R> Shutter<V,R> gen(Function<V,Optional<R>> getter, BiFunction<V,R,V> setter)  {
             return new Shutter<V,R>() {
                 @Override public Optional<R> getOptional(V v)  {
-                        return setter.apply(v);
+                        return getter.apply(v);
                     }
 
                 @Override
-                public Function<R,V> setOptional(V xs) {
-                    return curry(getter).apply(xs);
+                public Function<R,V> setOptional(V v) {
+                    return curry(setter).apply(v);
+                }
+
+                @Override
+                public boolean nonEmpty(V v) {
+                    return getOptional(v).map(x -> false).orElse(true);
                 }
             };
         }
@@ -81,5 +87,15 @@ public class ShutterTest {
     public void shutterShouldSetEmptyOptionalValue()  {
         List<Integer> set = head.setOptional(ys).apply(5);
         assertThat(set, IsEmptyCollection.empty());
+    }
+
+    @Test
+    public void nonEmptyShouldReturnFalseWhereTargetIsPopulated()  {
+        assertThat(head.nonEmpty(xs), is(false));
+    }
+
+    @Test
+    public void nonEmptyShouldReturnTrueWhereTargetIsEmpty()  {
+        assertThat(head.nonEmpty(ys), is(true));
     }
 }

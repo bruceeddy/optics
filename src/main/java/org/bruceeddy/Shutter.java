@@ -9,4 +9,6 @@ public interface Shutter<V,R> {
     Optional<R> getOptional(V v);
 
     Function<R,V> setOptional(V xs);
+
+    boolean nonEmpty(V xs);
 }
