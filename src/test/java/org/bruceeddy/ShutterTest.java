@@ -49,7 +49,12 @@ public class ShutterTest {
 
                 @Override
                 public Function<V, V> modify(Function<R, R> f) {
-                    return v -> getOptional(v).map(f).map(r -> setOptional(r)).map(h -> h.apply(v)).orElse(v);
+                    return v -> modifyOptional(f).apply(v).orElse(v);
+                }
+
+                @Override
+                public Function<V, Optional<V>> modifyOptional(Function<R, R> f) {
+                    return v -> getOptional(v).map(f).map(r -> setOptional(r)).map(h -> h.apply(v));
                 }
             };
         }
@@ -117,6 +122,18 @@ public class ShutterTest {
     public void modifyShouldNotModifyEmptyTarget() {
         List<Integer> set = head.modify(x -> x + 10).apply(ys);
         assertThat(set, IsEmptyCollection.empty());
+    }
+
+    @Test
+    public void modifyOptionalShouldModifyPopulatedTarget() {
+        Optional<List<Integer>> set = head.modifyOptional(x -> x + 10).apply(xs);
+        assertThat(set, contains(IsIterableContainingInOrder.contains(11, 2, 3)));
+    }
+
+    @Test
+    public void modifyOptionalShouldNotModifyEmptyTarget() {
+        Optional<List<Integer>> set = head.modifyOptional(x -> x + 10).apply(ys);
+        assertThat(set, empty());
     }
 }
 
