@@ -12,8 +12,8 @@ others are variations or generalisations of this basic idea.
 Whose idea is this?
 -------------------
 
-Unruly Optics is heavily influenced by Monocle (Julien Truffaut, Scala),
-which in turn owes a lot to Control.Lens (Edward Kmett, Haskell).  It's a 
+Unruly Optics is heavily influenced by [Monocle](https://github.com/julien-truffaut/Monocle) (Julien Truffaut, Scala),
+which in turn owes a lot to [Control.Lens](https://hackage.haskell.org/package/lens-4.15.4/docs/Control-Lens.html) (Edward Kmett, Haskell).  It's a 
 widely used pattern for handling immutable data.
 
 How do I include  it in my project?
