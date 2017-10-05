@@ -13,6 +13,7 @@
  * read about haskell lens - do the test examples in Haskell
  
  * package sources
+ * push to mvn central
  
  * example in exchange code - AuctionDecider
  * examples of replacing 
