@@ -16,8 +16,9 @@
  
  * example in exchange code - AuctionDecider
  * examples of replacing 
-    - builder pattern
-    - chains of getters
+    - builder pattern  - DecisionableResource
+    - chains of getters - AuctionDecider
+    ideally we use same optics for both
  
  * boiler-plateyness of real examples?
  * auto generation of lenses for data types
@@ -25,8 +26,11 @@
  * example using unruly.control Functor
  
  * other optics!  prisms!
- * Optional^WShutter
+ * ~~Optional^WShutter~~
  * ~~Do Optional excercises~~
+ * ~~Do prism exercises~~
+ 
+ * bug in modifyFFuture
  
 
  Notes
