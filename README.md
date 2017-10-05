@@ -39,7 +39,9 @@ of each method of Lens and Shutter being used.
 Why is it Unruly?
 ----------------
 
-Unruly is the name of the company I work for.  I did some of the work for this on their time.
+I work at [Unruly](https://medium.com/unruly-engineering).
+  I did some of the work for this during my 20% time there,
+   and I'm testing the ideas in the library on my colleagues.
 
 I see no mention of a *Shutter* in Monocle or Control.Lens
 --------------------
