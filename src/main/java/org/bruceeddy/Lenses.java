@@ -38,8 +38,8 @@ public class Lenses {
 
             @Override
             public Function<V, CompletableFuture<V>> modifyFFuture(Function<R, CompletableFuture<R>> f) {
-                return b -> functorFuture(modifyF(r -> futureFunctor(f.apply(r))).apply(b));
-                //return v -> f.apply(get(v)).thenApply(r -> set(r).apply(v));
+                //return b -> functorFuture(modifyF(r -> futureFunctor(f.apply(r))).apply(b));
+                return v -> f.apply(get(v)).thenApply(r -> set(r).apply(v));
             }
 
             @Override
