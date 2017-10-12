@@ -12,7 +12,7 @@
  
  * read about haskell lens - do the test examples in Haskell
  
- * package sources
+ * ~~package sources~~
  * push to mvn central
  
  * example in exchange code - AuctionDecider
@@ -26,10 +26,11 @@
  
  * example using unruly.control Functor
  
- * other optics!  prisms!
+ * other optics!  prisms! 
  * ~~Optional^WShutter~~
  * ~~Do Optional excercises~~
  * ~~Do prism exercises~~
+ * ~~Do traversal exercises~~
  
  * bug in modifyFFuture
  
